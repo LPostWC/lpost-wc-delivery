@@ -1,0 +1,69 @@
+body.iframe-order #wpadminbar,
+body.iframe-order #adminmenumain,
+body.iframe-order #adminmenuwrap,
+body.iframe-order #screen-meta,
+body.iframe-order #screen-meta-links,
+body.iframe-order #woocommerce-embedded-root,
+body.iframe-order .wp-heading-inline,
+body.iframe-order .page-title-action,
+body.iframe-order .wp-header-end,
+body.iframe-order #delete-action {
+	display: none;
+}
+body.iframe-order #wpbody-content > .wrap {
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 9999;
+	background: #f0f0f1;
+	overflow: auto;
+}
+/*
+.invoices-table td.info-cell {text-align: left;}
+.invoices-table td.state-cell {text-align: left;}
+.invoices-table th {text-align: center;}
+.invoices-table td {text-align: center;}
+*/
+
+.invoices-table .errors {
+	margin: 5px 0;
+	color: #ef0000;
+}
+
+.tablenav-invoices .tablenav-pages {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+}
+.tablenav-invoices .page-numbers {
+    display: inline-block;
+    vertical-align: baseline;
+    min-width: 30px;
+    min-height: 30px;
+    text-align: center;
+    line-height: 30px;
+    margin: 0;
+    padding: 0 4px;
+    font-size: 12px;
+    background: #f6f7f7;
+    border: 1px solid #cacaca;
+    box-shadow: none;
+    box-sizing: border-box;
+    text-decoration: none;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+.tablenav-invoices .page-numbers:hover {
+    background: #f0f0f1;
+    border-color: #0a4b78;
+    color: #0a4b78;
+}
+
+.tablenav-invoices .page-numbers.current {
+	color: #cacaca!important;
+	border-color: #cacaca!important;
+	cursor: default!important;
+}

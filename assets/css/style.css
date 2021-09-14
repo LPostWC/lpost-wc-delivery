@@ -1,0 +1,21 @@
+
+.courier_coords-field {display: none;}
+.map-element {height: 70vh; width: 90vw;}
+
+#map-container-pickup {position: relative;}
+.pickup-list {position: absolute; left: 20px; top: 20px; max-width: 330px; width: 100%; max-height: 90%; background-color: #fff; overflow: hidden; display: flex; flex-direction: column;}
+.pickup-list ul {list-style: none; margin: 0; max-height: 100%; border-top: 1px solid #ccc;}
+.pickup-list ul li a {padding: 12px; padding-left: 26px; border-bottom: 1px solid #ccc; display: block; font-size: 14px; cursor: pointer;}
+.pickup-list .pickup-item-title {font-size: 16px; font-weight: 600;}
+.pickup-list .pickup-search input {width: 100%;}
+.pickup-list .list-holder {overflow-y: auto;}
+.pickup-list .hidden-block {display: none;}
+.pickup-list .time-block {display: flex;}
+.pickup-list .time-block .day {margin-left: 4px;}
+
+div[id*="map-container"] .pp-btn {background: linear-gradient(180deg,#ff4800 0,#ff8700); display: inline-block; padding: 10px 12px; color: #fff; text-decoration: none; cursor: pointer; border-radius: 3px;}
+#cboxLoadedContent {margin-bottom: 0;}
+
+@media (max-width: 767px) {
+	.pickup-list {display: none;}
+}
