@@ -306,7 +306,7 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 
 		$goodsDimensions = $this->get_goods_dimensions($package);
 
-		$ID_PickupPoint = (isset($postDecode['ID_PickupPoint']) and $delivType === 'pickup') ? $postDecode['ID_PickupPoint'] : $cityPointsArr[0]->ID_PickupPoint;
+		$ID_PickupPoint = (isset($postDecode['ID_PickupPoint']) and $delivType === 'pickup') ? esc_html($postDecode['ID_PickupPoint']) : $cityPointsArr[0]->ID_PickupPoint;
 
 		$json = array(
 			'ID_Sklad' => $ID_Sklad,
@@ -318,9 +318,9 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 		);
 
 		$pickup = true;
-		$courier_coords = $postDecode['courier_coords'] ?? '';
-		$courierCalendar = $postDecode['delivery_date'] ?? '';
-		$courierTime = $postDecode['delivery_interval'] ?? '';
+		$courier_coords = (isset($postDecode['courier_coords']) ? esc_html($postDecode['courier_coords']) : '');
+		$courierCalendar = (isset($postDecode['delivery_date']) ? esc_html($postDecode['delivery_date']) : '');
+		$courierTime = (isset($postDecode['delivery_interval']) ? esc_html($postDecode['delivery_interval']) : '');
 
 		if ($delivType !== 'pickup') { //если курьер
 			$pickup = false;

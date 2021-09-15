@@ -484,10 +484,10 @@ class LPost_WC {
         <div class="address">
 			<p>
 			<?php
-            echo '<span>' . __( 'Номер подъезда' ) . ':</span> ' . strip_tags($courier_porch) . '<br/>';
-            echo '<span>' . __( 'Номер этажа' ) . ':</span> ' . strip_tags($courier_floor) . '<br/>';
-			echo '<span>' . __( 'Квартира/офис' ) . ':</span> ' . strip_tags($courier_flat) . '<br/>';
-			echo '<span>' . __( 'Код домофона' ) . ':</span> ' . strip_tags($courier_code); 
+            echo '<span>' . __( 'Номер подъезда' ) . ':</span> ' . esc_html($courier_porch) . '<br/>';
+            echo '<span>' . __( 'Номер этажа' ) . ':</span> ' . esc_html($courier_floor) . '<br/>';
+			echo '<span>' . __( 'Квартира/офис' ) . ':</span> ' . esc_html($courier_flat) . '<br/>';
+			echo '<span>' . __( 'Код домофона' ) . ':</span> ' . esc_html($courier_code); 
 			?>
 			</p>
         </div>
@@ -798,23 +798,23 @@ class LPost_WC {
 						</td>
 						<td class="info-cell">
 							<?php if(!empty($shipment_id)): ?>
-							<strong>Отправление: № <?php echo $shipment_id; ?></strong>
+							<strong>Отправление: № <?php echo esc_html($shipment_id); ?></strong>
 							<?php endif;?>
-							<div><a class="row-title" href="post.php?post=<?php echo $order_id; ?>&action=edit">Заказ <?php echo $order_id; ?></a> (<?php echo wc_price($order->get_shipping_total())?>)</div>
-							<div><span class="title">Получатель: </span><span class="value"> <?php echo $order->get_formatted_billing_full_name()?></span></div>
+							<div><a class="row-title" href="post.php?post=<?php echo esc_html($order_id); ?>&action=edit">Заказ <?php echo esc_html($order_id); ?></a> (<?php echo wc_price($order->get_shipping_total())?>)</div>
+							<div><span class="title">Получатель: </span><span class="value"> <?php echo $order->get_formatted_billing_full_name(); ?></span></div>
 						</td>
 						<td class="edit-order">
 							<?if(!empty($invoiceID)):?>
 							Создан акт, <br>редактирование не доступно
 							<?else:?>
-							<a class="thickbox" href="<?php echo $editHref?>" data-orderid="<?php echo $order_id?>">Изменить заказ</a>
+							<a class="thickbox" href="<?php echo esc_html($editHref); ?>" data-orderid="<?php echo esc_html($order_id); ?>">Изменить заказ</a>
 							<?endif;?>
 						</td>
 						<td class="create-invoice-cell">
 							<?if(!empty($invoiceID)):?>
-								<strong><? echo $invoiceID; ?></strong>
+								<strong><? echo esc_html($invoiceID); ?></strong>
 							<?else:?>
-							<a data-orderid="<?php echo $order_id?>" data-action="create-invoice" data-shipment_id="<?php echo $shipment_id?>" href="javascript:void(0)">Создать акт</a>
+							<a data-orderid="<?php echo esc_html($order_id); ?>" data-action="create-invoice" data-shipment_id="<?php echo esc_html($shipment_id); ?>" href="javascript:void(0)">Создать акт</a>
 								<?if(!empty($actBeforeTime)):?>
 								<br>Необходимо создать акт до <? echo date('d.m.Y H:i', strtotime($actBeforeTime)); ?>
 								<?endif;?>
@@ -975,12 +975,12 @@ class LPost_WC {
 		?>
 		<?php $linkText = ($delivType === 'pickup') ? 'Выбрать пункт выдачи' : 'Указать адрес доставки'?>
 		<div class="deliv_type">
-			<div><a href="javascript:void(0)" data-deliv_type="<?php echo $delivType?>" class="ch-pickup-pont"><?php echo $linkText?></a></div>
+			<div><a href="javascript:void(0)" data-deliv_type="<?php echo esc_html($delivType); ?>" class="ch-pickup-pont"><?php echo esc_html($linkText); ?></a></div>
 			<?php if (isset($cityPointsArr)): ?>
-				<script type="text/javascript">var pickupPoints<?php echo $delivType?> = <?php echo $cityPointsArr ?></script>
+				<script type="text/javascript">var pickupPoints<?php echo esc_html($delivType); ?> = <?php echo $cityPointsArr; ?></script>
 			<?php endif ?>
 			<div class="map-holder" style="display: none;">
-				<div id="map-container-<?php echo $delivType ?>">
+				<div id="map-container-<?php echo esc_html($delivType); ?>">
 					<div class="map-element"></div>
 					<?php if ($delivType !== 'pickup'): ?>
 						<div class="control-div">
@@ -990,36 +990,27 @@ class LPost_WC {
 				</div>
 			</div>
 			<?php if ($delivType === 'pickup'):
-				$ship_to_different_address = $postDecode['ship_to_different_address'] ?? false;
+				$ship_to_different_address = $postDecode['ship_to_different_address'] ? esc_html($postDecode['ship_to_different_address']) : false;
 			    $billingAddress = $postDecode['billing_address_1'] ?? '';
 
-                $addressText = ($postDecode and !empty($postDecode['shipping_address_1']) and $ship_to_different_address) ? $postDecode['shipping_address_1'] : $billingAddress;
+                $addressText = ($postDecode and !empty($postDecode['shipping_address_1']) and $ship_to_different_address) ? esc_html($postDecode['shipping_address_1']) : $billingAddress;
 			    $addressText = str_ireplace('Самовывоз: ', '', $addressText);
 				$addressTextKey = array_search($addressText, array_column(json_decode($cityPointsArr), 'Address'));
 				if ($addressTextKey) $ID_PickupPoint = json_decode($cityPointsArr)[$addressTextKey]->ID_PickupPoint;
-
-				/*echo '<pre>';
-				print_r('<h2>$cityPointsArr</h2>');
-				print_r($cityPointsArr);
-				print_r('<h2>$postDecode</h2>');
-				print_r($postDecode);
-				echo '</pre>';
-				die();*/
                 ?>
-				<input type="hidden" name="ID_PickupPoint" value="<?php echo $ID_PickupPoint?>">
+				<input type="hidden" name="ID_PickupPoint" value="<?php echo esc_html($ID_PickupPoint); ?>">
             <?php else:?>
 				<?php
 				$calendarValue = $delivTime[0]->DateDelive;
 				$timeValue = 0;
 				if ($postDecode) {
-					$calendarValue = $postDecode['delivery_date'] ?? $delivTime[0]->DateDelive;
-					$timeValue = $postDecode['delivery_interval'] ?? '';
+					$calendarValue = $postDecode['delivery_date'] ? esc_html($postDecode['delivery_date']) : $delivTime[0]->DateDelive;
+					$timeValue = $postDecode['delivery_interval'] ? esc_html($postDecode['delivery_interval']) : '';
 				}
 
 				woocommerce_form_field( 'delivery_date', [
 					'type'  => 'date',
 					'class' => ['delivery_date-field'],
-					//'label' => __( 'Courier Calendar' ),
 					'label' => __( 'Выберите дату доставки' ),
 					'required' => true,
 					'default' => date('d.m.Y', strtotime($delivTime[0]->DateDelive)),
@@ -1034,7 +1025,6 @@ class LPost_WC {
 					'type'  => 'select',
 					'class' => ['delivery_interval-field', 'wc-enhanced-select'],
 					'input_class' => ['wc-enhanced-select'],
-					//'label' => __( 'Courier Time' ),
 					'label' => __( 'Выберите время' ),
 					'required' => true,
 					'options' => array(
@@ -1201,14 +1191,3 @@ class LPost_WC {
 		);*/
 	}
 }
-
-add_filter('wp_die_handler', function ($func) {
-	return function ($message, $title = '', $args = array()) {
-		@ini_set('display_errors', 'on');
-		echo '<pre>';
-		print_r('<h2>$message</h2>');
-		print_r($message);
-		echo '</pre>';
-	};
-});
-
