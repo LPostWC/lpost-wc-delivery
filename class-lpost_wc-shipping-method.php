@@ -20,7 +20,7 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 	/**
 	 * @var LPost_WC_Helper
 	 */
-	private $ghelper;
+	private $helper;
 
 	/**
 	 * Constructor
@@ -29,7 +29,7 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 	 */
 	public function __construct( $instance_id = 0 ) {
 		include_once __DIR__.'/lpost-wc-helper.php';
-		$this->ghelper = new LPost_WC_Helper();
+		$this->helper = new LPost_WC_Helper();
 
 		$this->init_form_fields();
 		$this->init_settings();
@@ -89,7 +89,7 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 	}
 
 	public function init_form_fields() {
-		$receiveFieldOptions = $this->ghelper->getSortedReceivePointsOptions();
+		$receiveFieldOptions = $this->helper->getSortedReceivePointsOptions();
 		$regionsListOptions = $this->getRegionsListOptions();
 
 		$this->instance_form_fields = array(
@@ -253,7 +253,6 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 		$time         = '';
 		$to_code      = '';
 		$rate         = array();
-		$postDecode   = array();
 		//$services     = $this->services ? $this->services : array();
 		$from_country = get_option( 'woocommerce_default_country', 'RU' );
 		$from_country = $from_country ? explode( ':', $from_country )[0] : 'RU';
@@ -261,9 +260,8 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 		$to_postcode  = wc_format_postcode( $package['destination']['postcode'], $to_country );
 		$to_state     = $package['destination']['state'];
 		$to_city      = $package['destination']['city'];
-		if (isset($_POST['post_data'])) {
-			parse_str($_POST['post_data'], $postDecode);
-		}
+		
+		$postData = (!empty($_POST['post_data']) ? $this->helper->proper_parse_str($_POST['post_data']) : array());
 
 		if (!$to_city) {
 			$this->add_rate(
@@ -280,12 +278,12 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 
 		setlocale(LC_TIME, "ru_RU.utf8");
 
-		$token = $this->ghelper->getAuthToken();
+		$token = $this->helper->getAuthToken();
 		
 		$to_city = mb_strtolower($to_city);
 		$to_city = trim(str_ireplace(array('г.'), '', $to_city));
 
-		$points = $this->ghelper->GetPickupPoints($token, $delivType);
+		$points = $this->helper->GetPickupPoints($token, $delivType);
 		$cityPointsArr = array();
 
 		foreach ($points->PickupPoint as $pointKey=>$point) {
@@ -306,7 +304,7 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 
 		$goodsDimensions = $this->get_goods_dimensions($package);
 
-		$ID_PickupPoint = (isset($postDecode['ID_PickupPoint']) and $delivType === 'pickup') ? esc_html($postDecode['ID_PickupPoint']) : $cityPointsArr[0]->ID_PickupPoint;
+		$ID_PickupPoint = (isset($postData['ID_PickupPoint']) and $delivType === 'pickup') ? $postData['ID_PickupPoint'] : $cityPointsArr[0]->ID_PickupPoint;
 
 		$json = array(
 			'ID_Sklad' => $ID_Sklad,
@@ -318,9 +316,9 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 		);
 
 		$pickup = true;
-		$courier_coords = (isset($postDecode['courier_coords']) ? esc_html($postDecode['courier_coords']) : '');
-		$courierCalendar = (isset($postDecode['delivery_date']) ? esc_html($postDecode['delivery_date']) : '');
-		$courierTime = (isset($postDecode['delivery_interval']) ? esc_html($postDecode['delivery_interval']) : '');
+		$courier_coords = (isset($postData['courier_coords']) ? $postData['courier_coords'] : '');
+		$courierCalendar = (isset($postData['delivery_date']) ? $postData['delivery_date'] : '');
+		$courierTime = (isset($postData['delivery_interval']) ? $postData['delivery_interval'] : '');
 
 		if ($delivType !== 'pickup') { //если курьер
 			$pickup = false;
@@ -370,7 +368,7 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 			}
 		}
 
-		$response = $this->ghelper->makeCalcRequest($json);
+		$response = $this->helper->makeCalcRequest($json);
 		$body = json_decode($response['body']);
 		if (!$body->JSON_TXT) {
 			$this->maybe_print_error($body->errorMessage);
@@ -432,14 +430,14 @@ class LPost_WC_Shipping_Method extends WC_Shipping_Method {
 		$is_available = false;
 		$delivType = $this->get_option('deliv_type', '');
 
-		$token = $this->ghelper->getAuthToken($this->apikey);
+		$token = $this->helper->getAuthToken($this->apikey);
 		if (!$token) 
 		{
 			$this->maybe_print_error('No auth-token');
 		} 
 		else 
 		{
-			$points = $this->ghelper->GetPickupPoints($token, $delivType);
+			$points = $this->helper->GetPickupPoints($token, $delivType);
 			$cityColumns = array_column($points->PickupPoint, 'CityName');
 			$cityColumns = array_map('mb_strtolower', $cityColumns);
 			

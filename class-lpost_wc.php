@@ -968,8 +968,8 @@ class LPost_WC {
 		$delivTime = json_decode($meta_data['deliv_time']);
 		$ID_PickupPoint = $meta_data['ID_PickupPoint'];
 
-		$postDecode = array();
-		if (isset($_POST['post_data'])) parse_str($_POST['post_data'], $postDecode);
+		$postData = (!empty($_POST['post_data']) ? $this->helper->proper_parse_str($_POST['post_data']) : array());
+		
 		if (empty($delivType)) return true;
 
 		?>
@@ -990,10 +990,10 @@ class LPost_WC {
 				</div>
 			</div>
 			<?php if ($delivType === 'pickup'):
-				$ship_to_different_address = $postDecode['ship_to_different_address'] ? esc_html($postDecode['ship_to_different_address']) : false;
-			    $billingAddress = $postDecode['billing_address_1'] ?? '';
+				$ship_to_different_address = (!empty($postData['ship_to_different_address']) ? $postData['ship_to_different_address'] : false);
+			    $billingAddress = (!empty($postData['billing_address_1']) ? $postData['billing_address_1'] : '');
 
-                $addressText = ($postDecode and !empty($postDecode['shipping_address_1']) and $ship_to_different_address) ? esc_html($postDecode['shipping_address_1']) : $billingAddress;
+                $addressText = (!empty($postData['shipping_address_1']) && $ship_to_different_address) ? $postData['shipping_address_1'] : $billingAddress;
 			    $addressText = str_ireplace('Самовывоз: ', '', $addressText);
 				$addressTextKey = array_search($addressText, array_column(json_decode($cityPointsArr), 'Address'));
 				if ($addressTextKey) $ID_PickupPoint = json_decode($cityPointsArr)[$addressTextKey]->ID_PickupPoint;
@@ -1003,9 +1003,9 @@ class LPost_WC {
 				<?php
 				$calendarValue = $delivTime[0]->DateDelive;
 				$timeValue = 0;
-				if ($postDecode) {
-					$calendarValue = $postDecode['delivery_date'] ? esc_html($postDecode['delivery_date']) : $delivTime[0]->DateDelive;
-					$timeValue = $postDecode['delivery_interval'] ? esc_html($postDecode['delivery_interval']) : '';
+				if ($postData) {
+					$calendarValue = $postData['delivery_date'] ? $postData['delivery_date'] : $delivTime[0]->DateDelive;
+					$timeValue = $postData['delivery_interval'] ? $postData['delivery_interval'] : '';
 				}
 
 				woocommerce_form_field( 'delivery_date', [
@@ -1190,4 +1190,5 @@ class LPost_WC {
 			}
 		);*/
 	}
+	
 }
