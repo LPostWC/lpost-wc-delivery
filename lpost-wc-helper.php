@@ -403,7 +403,7 @@ class LPost_WC_Helper extends LPost_WC
 		return $response;
 	}
 	
-	public function proper_parse_str($queryString, $isESC = true, $argSeparator = '&', $decType = PHP_QUERY_RFC1738) 
+	public function proper_parse_str($queryString, $argSeparator = '&', $decType = PHP_QUERY_RFC1738) 
 	{
 		if (empty($queryString)) return array();
 		$result = array();
@@ -458,12 +458,13 @@ class LPost_WC_Helper extends LPost_WC
 				} 
 				elseif (isset($target[$index]) && !is_array($target[$index])) 
 				{
+					$index = esc_html($index);
 					$target[$index] = array($target[$index]);
 				}
 				$target = &$target[$index];
 			}
 			
-			$paramValue = ($isESC ? esc_html($paramValue) : $paramValue);
+			$paramValue = esc_html($paramValue);
 			
 			if (is_array($target)) 
 			{
