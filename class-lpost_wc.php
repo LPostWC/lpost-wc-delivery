@@ -804,27 +804,26 @@ class LPost_WC {
 							<div><span class="title">Получатель: </span><span class="value"> <?php echo $order->get_formatted_billing_full_name(); ?></span></div>
 						</td>
 						<td class="edit-order">
-							<?if(!empty($invoiceID)):?>
+							<?php if(!empty($invoiceID)): ?>
 							Создан акт, <br>редактирование не доступно
-							<?else:?>
+							<?php else: ?>
 							<a class="thickbox" href="<?php echo esc_html($editHref); ?>" data-orderid="<?php echo esc_html($order_id); ?>">Изменить заказ</a>
-							<?endif;?>
+							<?php endif; ?>
 						</td>
 						<td class="create-invoice-cell">
-							<?if(!empty($invoiceID)):?>
-								<strong><? echo esc_html($invoiceID); ?></strong>
-							<?else:?>
+							<?php if(!empty($invoiceID)):?>
+								<strong><?php echo esc_html($invoiceID); ?></strong>
+							<?php else: ?>
 							<a data-orderid="<?php echo esc_html($order_id); ?>" data-action="create-invoice" data-shipment_id="<?php echo esc_html($shipment_id); ?>" href="javascript:void(0)">Создать акт</a>
 								<?if(!empty($actBeforeTime)):?>
 								<br>Необходимо создать акт до <? echo date('d.m.Y H:i', strtotime($actBeforeTime)); ?>
-								<?endif;?>
-							<?endif;?>
+								<?php endif; ?>
+							<?php endif; ?>
 						</td>
 						<td class="create-label-cell">
-							<?if(!empty($shipmentLabelLink)):?>
-								<a href="<?php echo $shipmentLabelLink?>" target="_blank">Открыть</a>
-							<?else:?>
-							<?endif;?>
+							<?php if(!empty($shipmentLabelLink)):?>
+								<a href="<?php echo $shipmentLabelLink; ?>" target="_blank">Открыть</a>
+							<?php endif; ?>
 						</td>
 						<td>
 
@@ -834,33 +833,32 @@ class LPost_WC {
 				</tbody>
 			</table>
 
+			<?php
+			$countOrders = $this->getCountOrdersDB();
+			if($countOrders>0)
+			{
+				?>
 			<div class="orders-pagination">
-				<?php
-				$countOrders = $this->getCountOrdersDB();
-
-				$page_links = paginate_links( array(
-					'base' => '%_%',
-					'format' => '?pageSect=%#%',
-					'prev_text' => __( '&laquo;', 'lpost-wc-delivery' ),
-					'next_text' => __( '&raquo;', 'lpost-wc-delivery' ),
-					'total' => ceil($countOrders / 20),
-					'current' => $pageSect
-				) );
-
-				if ( $page_links ) {
-					?>
-					<div class="tablenav tablenav-invoices">
-						<div class="tablenav-pages">
-							<span class="displaying-num"><? echo $this->num_decline($countOrders, 'элемент, элемента, элементов' ); ?></span>
-							<div class="pagination-links"><? echo $page_links; ?></div>
+				<div class="tablenav tablenav-invoices">
+					<div class="tablenav-pages">
+						<span class="displaying-num"><?php echo $this->num_decline($countOrders, 'элемент, элемента, элементов' ); ?></span>
+						<div class="pagination-links">
+							<?php
+							echo paginate_links( array(
+								'base' => '%_%',
+								'format' => '?pageSect=%#%',
+								'prev_text' => __( '&laquo;', 'lpost-wc-delivery' ),
+								'next_text' => __( '&raquo;', 'lpost-wc-delivery' ),
+								'total' => ceil($countOrders / 20),
+								'current' => $pageSect
+							) );
+							?>
 						</div>
 					</div>
-					<?
-				}
-				?>
+				</div>
 			</div>
-
             <?php
+			}
 			if (!empty($_GET['log'])) 
 			{
 				echo '<h2>ordersCreateResult</h2><pre>'.print_r($ordersCreateResult,1).'</pre>';
@@ -872,11 +870,11 @@ class LPost_WC {
 		}
 		else 
 		{
-			?><div class="notice notice-warning"><p>Ничего не найдено</p></div><?
+			?><div class="notice notice-warning"><p>Ничего не найдено</p></div><?php
 		}
 		?>
 		</div>
-		<?
+		<?php
     }
 
     public function convertDeliveryStates($state) {
@@ -989,24 +987,27 @@ class LPost_WC {
 					<?php endif ?>
 				</div>
 			</div>
-			<?php if ($delivType === 'pickup'):
-				$ship_to_different_address = (!empty($postData['ship_to_different_address']) ? $postData['ship_to_different_address'] : false);
-			    $billingAddress = (!empty($postData['billing_address_1']) ? $postData['billing_address_1'] : '');
+			<?php 
+			if ($delivType === 'pickup')
+			{
+			
+				$ship_to_different_address = (!empty($postData['ship_to_different_address']) ? esc_html($postData['ship_to_different_address']) : false);
+			    $billingAddress = (!empty($postData['billing_address_1']) ? esc_html($postData['billing_address_1']) : '');
 
-                $addressText = (!empty($postData['shipping_address_1']) && $ship_to_different_address) ? $postData['shipping_address_1'] : $billingAddress;
+                $addressText = ((!empty($postData['shipping_address_1']) && $ship_to_different_address) ? esc_html($postData['shipping_address_1']) : $billingAddress);
 			    $addressText = str_ireplace('Самовывоз: ', '', $addressText);
+				
 				$addressTextKey = array_search($addressText, array_column(json_decode($cityPointsArr), 'Address'));
-				if ($addressTextKey) $ID_PickupPoint = json_decode($cityPointsArr)[$addressTextKey]->ID_PickupPoint;
-                ?>
-				<input type="hidden" name="ID_PickupPoint" value="<?php echo esc_html($ID_PickupPoint); ?>">
-            <?php else:?>
-				<?php
-				$calendarValue = $delivTime[0]->DateDelive;
-				$timeValue = 0;
-				if ($postData) {
-					$calendarValue = $postData['delivery_date'] ? $postData['delivery_date'] : $delivTime[0]->DateDelive;
-					$timeValue = $postData['delivery_interval'] ? $postData['delivery_interval'] : '';
-				}
+				if ($addressTextKey) 
+					$ID_PickupPoint = json_decode($cityPointsArr)[$addressTextKey]->ID_PickupPoint;
+				
+				?><input type="hidden" name="ID_PickupPoint" value="<?php echo esc_html($ID_PickupPoint); ?>"><?php 
+			}	
+			else
+			{
+			
+				$calendarValue = (!empty($postData['delivery_date']) ? esc_html($postData['delivery_date']) : $delivTime[0]->DateDelive);
+				$timeValue = (!empty($postData['delivery_interval']) ? esc_html($postData['delivery_interval']) : 0);
 
 				woocommerce_form_field( 'delivery_date', [
 					'type'  => 'date',
@@ -1038,8 +1039,9 @@ class LPost_WC {
 						'required' => 'required'
 					)
 				], $timeValue);
-				?>
-			<?php endif ?>
+				
+			}
+			?>
 		</div>
 		<?php
 	}

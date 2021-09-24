@@ -458,13 +458,10 @@ class LPost_WC_Helper extends LPost_WC
 				} 
 				elseif (isset($target[$index]) && !is_array($target[$index])) 
 				{
-					$index = esc_html($index);
 					$target[$index] = array($target[$index]);
 				}
 				$target = &$target[$index];
 			}
-			
-			$paramValue = esc_html($paramValue);
 			
 			if (is_array($target)) 
 			{
@@ -475,6 +472,7 @@ class LPost_WC_Helper extends LPost_WC
 				$target = $paramValue;
 			}
 		}
+		
 		return $result;
 	}
 }
